@@ -1,14 +1,32 @@
 <resources>
     <string name="app_name">Opensqldroid</string>
 
+
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <string name="button_save">Save</string>
+    <string name="button_cancel">Cancel</string>
+
     <string name="action_settings">Settings</string>
+
     <string name="server_name">Server Name</string>
     <string name="server_address">Server Address</string>
     <string name="server_port">Port</string>
     <string name="user_name">User Name</string>
     <string name="user_password">User Password</string>
     <string name="new_server_title">New Server Connection</string>
+
+    <string name="menu_home">User Name</string>
+    <string name="menu_gallery">User Name</string>
+    <string name="menu_slideshow">User Name</string>
+    <string name="menu_tools">User Name</string>
+    <string name="menu_share">User Name</string>
+    <string name="menu_send">User Name</string>
+
+    <!-- header -->
+    <string name="nav_header_desc">Description</string>
+    <string name="nav_header_title">Title</string>
+    <string name="nav_header_subtitle">Subtitle</string>
 </resources>
