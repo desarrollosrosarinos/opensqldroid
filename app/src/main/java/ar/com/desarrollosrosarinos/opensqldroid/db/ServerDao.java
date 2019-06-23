@@ -1,5 +1,6 @@
 package ar.com.desarrollosrosarinos.opensqldroid.db;
 
+import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -10,7 +11,11 @@ import java.util.List;
 
 @Dao
 public interface ServerDao {
-    @Query("SELECT * FROM server")
+
+    @Query("SELECT * FROM server ORDER BY name ASC")
+    public abstract DataSource.Factory<Integer, Server> serversByName();
+
+    @Query("SELECT * FROM server ORDER BY name")
     List<Server> getAll();
 
     @Query("SELECT * FROM server WHERE uid IN (:userIds)")
