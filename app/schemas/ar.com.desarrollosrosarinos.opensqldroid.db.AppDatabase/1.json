@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "26cff1f002ac3ba1fc6b4e0ede902936",
+    "identityHash": "464e182dc6d99486e37cee1647bbd44b",
     "entities": [
       {
         "tableName": "Server",
@@ -59,12 +59,45 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "Queries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `fecha` TEXT NOT NULL, `query` TEXT, PRIMARY KEY(`uid`, `fecha`))",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fecha",
+            "columnName": "fecha",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "query",
+            "columnName": "query",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "uid",
+            "fecha"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '26cff1f002ac3ba1fc6b4e0ede902936')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '464e182dc6d99486e37cee1647bbd44b')"
     ]
   }
 }

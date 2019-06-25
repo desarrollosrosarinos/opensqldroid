@@ -31,6 +31,7 @@ public class ServerConnectionNew extends Activity {
                 TextInputEditText txtServerName = findViewById(R.id.server_connection_server_name);
                 TextInputEditText txtServerAddress = findViewById(R.id.server_connection_server_address);
                 TextInputEditText txtServerPort = findViewById(R.id.server_connection_server_port);
+                TextInputEditText txtDatabase = findViewById(R.id.server_connection_database);
                 TextInputEditText txtUserName = findViewById(R.id.server_connection_user_name);
                 TextInputEditText txtUserPassword = findViewById(R.id.server_connection_user_password);
 
@@ -40,6 +41,7 @@ public class ServerConnectionNew extends Activity {
                 server.name = txtServerName.getText().toString();
                 server.address = txtServerAddress.getText().toString();
                 server.port = Integer.parseInt(txtServerPort.getText().toString());
+                server.database = txtDatabase.getText().toString();
                 server.userName = txtUserName.getText().toString();
                 server.userPassword = txtUserPassword.getText().toString();
 
@@ -47,6 +49,7 @@ public class ServerConnectionNew extends Activity {
                     @Override
                     public void run() {
                         db.serverDao().insertAll(server);
+                        finish();
                     }
                 });
 

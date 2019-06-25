@@ -32,6 +32,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import ar.com.desarrollosrosarinos.opensqldroid.activities.ServerConnectionNew;
 import ar.com.desarrollosrosarinos.opensqldroid.activities.SqlQueriesList;
+import ar.com.desarrollosrosarinos.opensqldroid.activities.ViewHolderClickListener;
 import ar.com.desarrollosrosarinos.opensqldroid.db.AppDatabase;
 import ar.com.desarrollosrosarinos.opensqldroid.db.Server;
 import ar.com.desarrollosrosarinos.opensqldroid.db.ServerDao;
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity
         /**
          * The list view of servers
          */
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, BuildConfig.APPLICATION_ID).build();
+        AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, BuildConfig.APPLICATION_ID).fallbackToDestructiveMigration().build();
         MyViewModel viewModel = new MyViewModel(db.serverDao());//ViewModelProviders.of(this).get(MyViewModel.class);
         RecyclerView recyclerView = findViewById(R.id.server_list);
         LinearLayoutManager llm = new LinearLayoutManager(this);
@@ -164,6 +165,8 @@ public class MainActivity extends AppCompatActivity
         public TextView title;
         public TextView description;
 
+        private ViewHolderClickListener clickListener;
+
         public ServerViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.server_list_title);
@@ -171,15 +174,18 @@ public class MainActivity extends AppCompatActivity
             itemView.setOnClickListener(this);
         }
 
+        public void addClickListener(ViewHolderClickListener clickListener){
+            this.clickListener = clickListener;
+        }
+
         @Override
         public void onClick(View view) {
-            int pos = getAdapterPosition();
-            Intent intent = new Intent(MainActivity.this, SqlQueriesList.class);
-            startActivity(intent);
+            clickListener.onClick(getAdapterPosition());
         }
     }
 
-    class ServerAdapter extends PagedListAdapter<Server, ServerViewHolder> {
+    class ServerAdapter extends PagedListAdapter<Server, ServerViewHolder> implements ViewHolderClickListener
+    {
         public ServerAdapter() {
             super(DIFF_CALLBACK);
         }
@@ -189,6 +195,7 @@ public class MainActivity extends AppCompatActivity
         public ServerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.server_list_item, parent, false);
             ServerViewHolder userViewHolder = new ServerViewHolder(view);
+            userViewHolder.addClickListener(this);
             return userViewHolder;
         }
 
@@ -197,6 +204,14 @@ public class MainActivity extends AppCompatActivity
             Server user = getItem(position);
             holder.title.setText(user.name);
             holder.description.setText(user.address+":"+user.port);
+        }
+
+        @Override
+        public void onClick(int position){
+            Server srv = getItem(position);
+            Intent intent = new Intent(MainActivity.this, SqlQueriesList.class);
+            intent.putExtra(SqlQueriesList.SERVER_UID,srv.uid);
+            startActivity(intent);
         }
     }
 

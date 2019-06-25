@@ -44,6 +44,11 @@
                     android:hint="@string/server_port"/>
             </LinearLayout>
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/server_connection_database"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/database"/>
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/server_connection_user_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

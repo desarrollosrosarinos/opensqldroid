@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class Server {
+    public static final int TYPE_POSTGRES = 1,TYPE_MYSQL = 2, TYPE_MICROFOST = 3;
     @PrimaryKey
     public int uid;
 
@@ -13,7 +14,7 @@ public class Server {
      * types: 1 - postgresql,2 - mysql,3 - microsoft
      */
     @ColumnInfo(name = "type")
-    public String type;
+    public int type;
 
     @ColumnInfo(name = "name")
     public String name;
@@ -23,6 +24,9 @@ public class Server {
 
     @ColumnInfo(name = "port")
     public int port;
+
+    @ColumnInfo(name = "database")
+    public String database;
 
     @ColumnInfo(name = "user_name")
     public String userName;

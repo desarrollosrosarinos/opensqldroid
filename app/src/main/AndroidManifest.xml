@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ar.com.desarrollosrosarinos.opensqldroid">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -22,6 +24,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.ServerConnectionNew" />
+        <activity android:name=".activities.SqlQueriesList" />
+        <activity android:name=".activities.QueriesNew" />
     </application>
 
 </manifest>

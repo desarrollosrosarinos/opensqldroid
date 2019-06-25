@@ -21,8 +21,8 @@ public interface ServerDao {
     @Query("SELECT * FROM server WHERE uid IN (:userIds)")
     List<Server> loadAllByIds(int[] userIds);
 
-    @Query("SELECT * FROM server WHERE name LIKE :name")
-    Server findByName(String name);
+    @Query("SELECT * FROM server WHERE uid =:uid")
+    Server getByUid(int uid);
 
     @Insert
     void insertAll(Server... users);
