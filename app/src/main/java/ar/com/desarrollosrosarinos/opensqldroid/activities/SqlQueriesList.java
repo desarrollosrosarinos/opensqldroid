@@ -60,7 +60,7 @@ public class SqlQueriesList extends AppCompatActivity {
                 public void onClick(View view) {
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
-                    Intent intent = new Intent(SqlQueriesList.this,QueriesNew.class);
+                    Intent intent = new Intent(SqlQueriesList.this, QueriesEditor.class);
                     intent.putExtra(SqlQueriesList.SERVER_UID,serverUid);
                     startActivity(intent);
                 }
