@@ -4,24 +4,23 @@ import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
-import androidx.room.Query;
 import androidx.room.Update;
 
 @Dao
 public interface QueriesDao {
 
-    @Query("SELECT * FROM queries WHERE uid = :serverUid ORDER BY fecha")
-    public abstract DataSource.Factory<Integer, Queries>  loadAllByServer(int serverUid);
+    @androidx.room.Query("SELECT * FROM `Query` WHERE uid = :serverUid ORDER BY timestamp")
+    public abstract DataSource.Factory<Integer, Query>  loadAllByServer(int serverUid);
 
-    @Query("SELECT * FROM queries WHERE uid = :uid AND fecha = :fecha")
-    Queries getQuery(int uid,String fecha);
+    @androidx.room.Query("SELECT * FROM `Query` WHERE uid = :uid AND timestamp = :timestamp")
+    Query getQuery(int uid, long timestamp);
 
     @Insert
-    void insertAll(Queries... users);
+    void insertAll(Query... users);
 
     @Delete
-    void delete(Queries user);
+    void delete(Query user);
 
     @Update
-    void updateServers(Queries... servers);
+    void updateServers(Query... servers);
 }

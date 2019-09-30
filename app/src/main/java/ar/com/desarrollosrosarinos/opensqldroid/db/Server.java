@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 @Entity
 public class Server {
     public static final int TYPE_POSTGRES = 1,TYPE_MYSQL = 2, TYPE_MICROFOST = 3;
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public int uid;
 
     /**

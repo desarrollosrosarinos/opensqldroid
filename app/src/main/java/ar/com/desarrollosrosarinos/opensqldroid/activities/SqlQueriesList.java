@@ -2,7 +2,7 @@ package ar.com.desarrollosrosarinos.opensqldroid.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +25,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import ar.com.desarrollosrosarinos.opensqldroid.BuildConfig;
 import ar.com.desarrollosrosarinos.opensqldroid.R;
 import ar.com.desarrollosrosarinos.opensqldroid.db.AppDatabase;
-import ar.com.desarrollosrosarinos.opensqldroid.db.Queries;
+import ar.com.desarrollosrosarinos.opensqldroid.db.Query;
 import ar.com.desarrollosrosarinos.opensqldroid.db.QueriesDao;
 
 public class SqlQueriesList extends AppCompatActivity {
     private int serverUid;
     public static final String SERVER_UID = "SqlQueriesList.ServerUid";
+
+    QueriesAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +52,7 @@ public class SqlQueriesList extends AppCompatActivity {
             LinearLayoutManager llm = new LinearLayoutManager(this);
             llm.setOrientation(RecyclerView.VERTICAL);
             recyclerView.setLayoutManager(llm);
-            QueriesAdapter adapter = new QueriesAdapter();
+            adapter = new QueriesAdapter();
             viewModel.serversList.observe(this, pagedList -> adapter.submitList(pagedList));
             recyclerView.setAdapter(adapter);
 
@@ -68,28 +70,31 @@ public class SqlQueriesList extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+    }
+
     /**
      * Creating the view for the servers list
      */
 
     class MyViewModel extends ViewModel {
-        public final LiveData<PagedList<Queries>> serversList;
+        public final LiveData<PagedList<Query>> serversList;
         public MyViewModel(QueriesDao queriesDao) {
             serversList = new LivePagedListBuilder<>(
                     queriesDao.loadAllByServer(serverUid), /* page size */ 20).build();
         }
     }
 
-    public static DiffUtil.ItemCallback<Queries> DIFF_CALLBACK = new DiffUtil.ItemCallback<Queries>() {
+    public static DiffUtil.ItemCallback<Query> DIFF_CALLBACK = new DiffUtil.ItemCallback<Query>() {
         @Override
-        public boolean areItemsTheSame(@NonNull Queries oldItem, @NonNull Queries newItem) {
-            Log.e("areITems",""+(oldItem.uid == newItem.uid));
-            return oldItem.uid == newItem.uid && oldItem.fecha.equals(newItem.fecha);
+        public boolean areItemsTheSame(@NonNull Query oldItem, @NonNull Query newItem) {
+            return oldItem.uid == newItem.uid && oldItem.timestamp == newItem.timestamp;
         }
         @Override
-        public boolean areContentsTheSame(@NonNull Queries oldItem, @NonNull Queries newItem) {
-            Log.e("areITems",""+(oldItem.uid == newItem.uid));
-            return oldItem.uid == newItem.uid && oldItem.fecha.equals(newItem.fecha);
+        public boolean areContentsTheSame(@NonNull Query oldItem, @NonNull Query newItem) {
+            return oldItem.uid == newItem.uid && oldItem.timestamp == newItem.timestamp;
         }
     };
 
@@ -98,6 +103,8 @@ public class SqlQueriesList extends AppCompatActivity {
         public TextView title;
         public TextView description;
 
+        private ViewHolderClickListener clickListener;
+
         public QueriesViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.server_list_title);
@@ -105,15 +112,20 @@ public class SqlQueriesList extends AppCompatActivity {
             itemView.setOnClickListener(this);
         }
 
+        public void addClickListener(ViewHolderClickListener clickListener){
+            this.clickListener = clickListener;
+        }
+
         @Override
         public void onClick(View view) {
             int pos = getAdapterPosition();
-            Intent intent = new Intent(SqlQueriesList.this, SqlQueriesList.class);
-            startActivity(intent);
+            if (clickListener != null){
+                clickListener.onClick(pos);
+            }
         }
     }
 
-    class QueriesAdapter extends PagedListAdapter<Queries, QueriesViewHolder> {
+    class QueriesAdapter extends PagedListAdapter<Query, QueriesViewHolder> implements ViewHolderClickListener {
         public QueriesAdapter() {
             super(DIFF_CALLBACK);
         }
@@ -123,14 +135,25 @@ public class SqlQueriesList extends AppCompatActivity {
         public QueriesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.server_list_item, parent, false);
             QueriesViewHolder userViewHolder = new QueriesViewHolder(view);
+            userViewHolder.addClickListener(this);
             return userViewHolder;
         }
 
         @Override
         public void onBindViewHolder(QueriesViewHolder holder, int position) {
-            Queries user = getItem(position);
-            holder.title.setText(user.fecha);
-            holder.description.setText(user.query);
+            Query query = getItem(position);
+            String date = DateFormat.format("yyyy-MM-dd hh:mm:ss", query.timestamp).toString();
+            holder.title.setText(date);
+            holder.description.setText(query.query);
+        }
+
+        @Override
+        public void onClick(int position){
+            Query query = getItem(position);
+            Intent intent = new Intent(SqlQueriesList.this, QueriesEditor.class);
+            intent.putExtra(SERVER_UID,query.uid);
+            intent.putExtra(QueriesEditor.QUERY_TIMESTAMP,query.timestamp);
+            startActivity(intent);
         }
     }
 }

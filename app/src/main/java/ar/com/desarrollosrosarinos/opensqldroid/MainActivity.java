@@ -40,6 +40,8 @@ import ar.com.desarrollosrosarinos.opensqldroid.db.ServerDao;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    ServerAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,9 +79,17 @@ public class MainActivity extends AppCompatActivity
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(llm);
-        ServerAdapter adapter = new ServerAdapter();
+        adapter = new ServerAdapter();
         viewModel.serversList.observe(this, pagedList -> adapter.submitList(pagedList));
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if (adapter != null){//if adapter is not null we reload changes because the new server was closed.
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
