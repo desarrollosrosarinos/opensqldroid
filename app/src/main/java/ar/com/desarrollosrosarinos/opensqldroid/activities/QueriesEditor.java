@@ -132,7 +132,13 @@ public class QueriesEditor extends Activity implements QueriesRunnerInterface {
             qrySave.setAppDatabase(db);
             Query qry = new Query();
             qry.uid = serverUid;
-            qry.timestamp = Calendar.getInstance().getTimeInMillis();
+            if (queryTimestamp > 0){
+                qry.timestamp = queryTimestamp;
+                qrySave.setUpdate(true);
+            }else{
+                qry.timestamp = Calendar.getInstance().getTimeInMillis();
+            }
+
             EditText editText = findViewById(R.id.queries_editor_sql);
             qry.query = editText.getText().toString();
             qrySave.execute(qry);

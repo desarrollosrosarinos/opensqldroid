@@ -22,5 +22,5 @@ public interface QueriesDao {
     void delete(Query user);
 
     @Update
-    void updateServers(Query... servers);
+    void updateQuery(Query... servers);
 }

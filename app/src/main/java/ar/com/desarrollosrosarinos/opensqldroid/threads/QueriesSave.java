@@ -7,14 +7,23 @@ import ar.com.desarrollosrosarinos.opensqldroid.db.Query;
 
 public class QueriesSave extends AsyncTask<Query, Float, Boolean> {
     private AppDatabase db;
+    private boolean update = false;
 
     public void setAppDatabase(AppDatabase db){
         this.db = db;
     }
 
+    public void setUpdate(boolean update){
+        this.update = update;
+    }
+
     @Override
     protected Boolean doInBackground(Query... queries) {
-        db.queriesDao().insertAll(queries);
+        if (update) {
+            db.queriesDao().updateQuery(queries);
+        }else{
+            db.queriesDao().insertAll(queries);
+        }
         return true;
     }
 

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -30,6 +31,8 @@ import androidx.room.Room;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.List;
+
 import ar.com.desarrollosrosarinos.opensqldroid.activities.ServerConnectionNew;
 import ar.com.desarrollosrosarinos.opensqldroid.activities.SqlQueriesList;
 import ar.com.desarrollosrosarinos.opensqldroid.activities.ViewHolderClickListener;
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     ServerAdapter adapter;
+    MyViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +60,7 @@ public class MainActivity extends AppCompatActivity
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
                 Intent intent = new Intent(MainActivity.this,ServerConnectionNew.class);
-                startActivity(intent);
+                startActivityForResult(intent,ServerConnectionNew.SERVER_NEW_CONNECTION);
             }
         });
 
@@ -74,7 +78,7 @@ public class MainActivity extends AppCompatActivity
          * The list view of servers
          */
         AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, BuildConfig.APPLICATION_ID).fallbackToDestructiveMigration().build();
-        MyViewModel viewModel = new MyViewModel(db.serverDao());//ViewModelProviders.of(this).get(MyViewModel.class);
+        viewModel = new MyViewModel(db.serverDao());//ViewModelProviders.of(this).get(MyViewModel.class);
         RecyclerView recyclerView = findViewById(R.id.server_list);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(RecyclerView.VERTICAL);
@@ -82,6 +86,18 @@ public class MainActivity extends AppCompatActivity
         adapter = new ServerAdapter();
         viewModel.serversList.observe(this, pagedList -> adapter.submitList(pagedList));
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode,
+                          int resultCode,
+                          @Nullable android.content.Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if (requestCode == ServerConnectionNew.SERVER_NEW_CONNECTION){
+            AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, BuildConfig.APPLICATION_ID).fallbackToDestructiveMigration().build();
+            viewModel.serversList = new LivePagedListBuilder<>(
+                    db.serverDao().serversByName(), /* page size */ 20).build();
+        }
     }
 
     @Override
@@ -150,7 +166,7 @@ public class MainActivity extends AppCompatActivity
      */
 
     class MyViewModel extends ViewModel {
-        public final LiveData<PagedList<Server>> serversList;
+        public LiveData<PagedList<Server>> serversList;
         public MyViewModel(ServerDao serverDao) {
             serversList = new LivePagedListBuilder<>(
                     serverDao.serversByName(), /* page size */ 20).build();
@@ -211,9 +227,9 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public void onBindViewHolder(ServerViewHolder holder, int position) {
-            Server user = getItem(position);
-            holder.title.setText(user.name);
-            holder.description.setText(user.address+":"+user.port);
+            Server server = getItem(position);
+            holder.title.setText(server.name);
+            holder.description.setText(server.address+":"+server.port);
         }
 
         @Override

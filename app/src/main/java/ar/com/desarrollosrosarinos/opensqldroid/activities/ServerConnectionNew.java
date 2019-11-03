@@ -18,6 +18,7 @@ import ar.com.desarrollosrosarinos.opensqldroid.db.AppDatabase;
 import ar.com.desarrollosrosarinos.opensqldroid.db.Server;
 
 public class ServerConnectionNew extends Activity {
+    public static final int SERVER_NEW_CONNECTION = 213;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
