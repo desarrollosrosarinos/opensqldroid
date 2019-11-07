@@ -1,11 +1,13 @@
 package ar.com.desarrollosrosarinos.opensqldroid.activities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,12 +29,14 @@ import ar.com.desarrollosrosarinos.opensqldroid.R;
 import ar.com.desarrollosrosarinos.opensqldroid.db.AppDatabase;
 import ar.com.desarrollosrosarinos.opensqldroid.db.Query;
 import ar.com.desarrollosrosarinos.opensqldroid.db.QueriesDao;
+import ar.com.desarrollosrosarinos.opensqldroid.db.Server;
 
 public class SqlQueriesList extends AppCompatActivity {
     private int serverUid;
     public static final String SERVER_UID = "SqlQueriesList.ServerUid";
 
     QueriesAdapter adapter;
+    private MyViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +51,7 @@ public class SqlQueriesList extends AppCompatActivity {
              * The list view of servers
              */
             AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, BuildConfig.APPLICATION_ID).build();
-            MyViewModel viewModel = new MyViewModel(db.queriesDao());//ViewModelProviders.of(this).get(MyViewModel.class);
+            viewModel = new MyViewModel(db.queriesDao());//ViewModelProviders.of(this).get(MyViewModel.class);
             RecyclerView recyclerView = findViewById(R.id.queries_list);
             LinearLayoutManager llm = new LinearLayoutManager(this);
             llm.setOrientation(RecyclerView.VERTICAL);
@@ -80,8 +84,11 @@ public class SqlQueriesList extends AppCompatActivity {
      */
 
     class MyViewModel extends ViewModel {
-        public final LiveData<PagedList<Query>> serversList;
+        public LiveData<PagedList<Query>> serversList;
         public MyViewModel(QueriesDao queriesDao) {
+            reloadData(queriesDao);
+        }
+        public void reloadData(QueriesDao queriesDao){
             serversList = new LivePagedListBuilder<>(
                     queriesDao.loadAllByServer(serverUid), /* page size */ 20).build();
         }
@@ -109,6 +116,8 @@ public class SqlQueriesList extends AppCompatActivity {
             super(itemView);
             title = itemView.findViewById(R.id.server_list_title);
             description = itemView.findViewById(R.id.server_list_description);
+            ImageButton btnDelete = itemView.findViewById(R.id.server_btn_delete);
+            btnDelete.setOnClickListener(this);
             itemView.setOnClickListener(this);
         }
 
@@ -118,9 +127,14 @@ public class SqlQueriesList extends AppCompatActivity {
 
         @Override
         public void onClick(View view) {
+
             int pos = getAdapterPosition();
             if (clickListener != null){
-                clickListener.onClick(pos);
+                if (view.getId() == R.id.server_btn_delete){
+                    clickListener.onDelete(pos);
+                }else {
+                    clickListener.onClick(pos);
+                }
             }
         }
     }
@@ -154,6 +168,16 @@ public class SqlQueriesList extends AppCompatActivity {
             intent.putExtra(SERVER_UID,query.uid);
             intent.putExtra(QueriesEditor.QUERY_TIMESTAMP,query.timestamp);
             startActivity(intent);
+        }
+
+        @Override
+        public void onDelete(int position) {
+            Query qry = getItem(position);
+            AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, BuildConfig.APPLICATION_ID).fallbackToDestructiveMigration().build();
+            AsyncTask.execute(() -> {
+                db.queriesDao().delete(qry);
+                viewModel.reloadData(db.queriesDao());
+            });
         }
     }
 }

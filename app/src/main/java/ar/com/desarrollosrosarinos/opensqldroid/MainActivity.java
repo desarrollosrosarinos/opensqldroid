@@ -1,6 +1,7 @@
 package ar.com.desarrollosrosarinos.opensqldroid;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -196,6 +198,8 @@ public class MainActivity extends AppCompatActivity
         public ServerViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.server_list_title);
+            ImageButton btnDelete = itemView.findViewById(R.id.server_btn_delete);
+            btnDelete.setOnClickListener(this);
             description = itemView.findViewById(R.id.server_list_description);
             itemView.setOnClickListener(this);
         }
@@ -206,7 +210,12 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public void onClick(View view) {
-            clickListener.onClick(getAdapterPosition());
+            if (view.getId() == R.id.server_btn_delete){
+                clickListener.onDelete(getAdapterPosition());
+            }else {
+                clickListener.onClick(getAdapterPosition());
+            }
+
         }
     }
 
@@ -238,6 +247,13 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this, SqlQueriesList.class);
             intent.putExtra(SqlQueriesList.SERVER_UID,srv.uid);
             startActivity(intent);
+        }
+
+        @Override
+        public void onDelete(int position) {
+            Server srv = getItem(position);
+            AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, BuildConfig.APPLICATION_ID).fallbackToDestructiveMigration().build();
+            AsyncTask.execute(() -> db.serverDao().delete(srv));
         }
     }
 
